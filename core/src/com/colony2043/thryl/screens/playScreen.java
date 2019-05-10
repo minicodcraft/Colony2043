@@ -1,5 +1,6 @@
 package com.colony2043.thryl.screens;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.colony2043.thryl.GameMain;
@@ -22,27 +24,30 @@ public class playScreen implements Screen {
     
     private float x, y;
 
-    float stateTimer;
-    float shootTimer;
+    float shootTimer = 0;
+    float rangetimer;
+    float rangeWait = 2f;
     float shootWait = .3f;
+
+    ShapeRenderer renderer;
 
     ArrayList<Bullet> bullets = new ArrayList<Bullet>();
     ArrayList<Bullet> bulletsToRemove = new ArrayList<Bullet>();
 
-    private Sprite
+    public Sprite
             playSpriteSD, playSpriteD,
             playSpriteDW, playSpriteW,
             playSpriteAW, playSpriteA,
             playSpriteAS, playSpriteS;
 
-    private Sprite playSprite;
+    public Sprite playSprite;
 
     String path = "C:\\Users\\minicodcraft\\Downloads\\game\\core\\assets";
-    private static Sprite HUD;
-    private static Sprite background;
+    private Sprite HUD;
+    private  Sprite background;
 
     public playScreen(GameMain game) {
-        shootTimer = 0;
+        rangetimer = 0;
         this.game = game;
         game.batch = new SpriteBatch();
 
@@ -91,18 +96,24 @@ public class playScreen implements Screen {
         playSprite.setSize(140, 140);
     }
 
-    @Override
     public void render(float delta) {
+         // HUD
+        HUD.setPosition(playSprite.getX() - 860, playSprite.getY() - 540);
+         // cam
+        cameraMain.position.set(100 + playSprite.getX(), playSprite.getY(), 0);
+        cameraMain.update();
+
+
         // shooting
         shootTimer += delta;
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) && shootTimer >= shootWait){
             shootTimer = 0;
-            bullets.add(new Bullet((80 + playSprite.getX()), (50 + playSprite.getY())));
+            bullets.add(new Bullet(70 + playSprite.getX(), 70 + playSprite.getY()));
         }
         // update bullets
         for(Bullet bullet : bullets){
             bullet.update(delta);
-            if(bullet.remove){
+            if(rangetimer >= rangeWait){
                 bulletsToRemove.add(bullet);
             }
         }
